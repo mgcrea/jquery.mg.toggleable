@@ -1,4 +1,4 @@
-# jQueryUI mgToggleable plugin #
+# jQuery mgToggleable plugin #
 
 Quickly setup triggers & toggles
 
