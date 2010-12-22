@@ -15,6 +15,8 @@
 
 (function( $, undefined ) {
 
+if(!window.console) window.console = {};
+
 $.fn.extend({
 
 	toggleable : function(options) {
@@ -43,7 +45,10 @@ $.fn.extend({
 		};
 
 		options = $.extend(defaults, options);
-		if(options.debug) console.log("initied with options", options);
+
+		if(!options.debug) logger.disableLogger();
+
+		console.log("$toggleable ~ initied with options", options);
 
 		return this.each(function() {
 			var $container = $(this);
@@ -57,33 +62,31 @@ $.fn.extend({
 
 			$triggers.each(function() {
 				var $trigger = $(this),
-					$toggles = $toggleable;
+					$toggles = $toggleable,
 					toggleGroup = $trigger.attr(options.group);
 
-				if(options.debug) console.log("$toggleable ~ found new trigger", $trigger, toggleGroup);
-				if(options.debug) console.log("	$toggles = $container.find("+options.target+")", $toggleable);
+				console.log("$toggleable ~ found new trigger", $trigger, toggleGroup);
+				console.log("	$toggles = $container.find("+options.target+")", $toggleable);
 
 				if(toggleGroup) {
 					$toggles = $toggles.filter("["+options.group+"*="+toggleGroup+"]");
-					if(options.debug) $.log("		$toggles.filter(["+options.group+"*="+toggleGroup+"])", $toggleable);
+					console.log("		$toggles.filter(["+options.group+"*="+toggleGroup+"])", $toggleable);
 				}
 				if(options.filter) {
 					$toggles = $toggles.filter(options.filter);
-					if(options.debug) $.log("		$toggles.filter("+options.filter+")", $toggleable);
+					console.log("		$toggles.filter("+options.filter+")", $toggleable);
 				}
 
-				$trigger.live(options.event, function(e) {
+				$trigger.bind(options.event, function(e) { // TODO : investigate why live() is not working
 					var toggleVal = $trigger.attr(options.toggle);
 					if(!toggleVal) toggleVal = $trigger.val() ? $trigger.val() : $trigger.text();
 
 					var $toggleOut = $toggles.filter(":not(["+options.toggle+"*="+toggleVal+"])");
 					var $toggleIn = $toggles.filter("["+options.toggle+"*="+toggleVal+"]");
 
-					if(options.debug) {
-						console.log("$trigger." + options.event + " triggered with value \""+toggleVal+"\" on", $trigger);
-						console.log("	$toggles.filter(" + ":not(["+options.toggle+"*="+toggleVal+"])", $toggleOut);
-						console.log("	$toggles.filter(" + "["+options.toggle+"*="+toggleVal+"])", $toggleIn);
-					}
+					console.log("$trigger." + options.event + " triggered with value \""+toggleVal+"\" on", $trigger);
+					console.log("	$toggles.filter(" + ":not(["+options.toggle+"*="+toggleVal+"])", $toggleOut);
+					console.log("	$toggles.filter(" + "["+options.toggle+"*="+toggleVal+"])", $toggleIn);
 
 					$triggers.not($trigger).removeClass("ui-state-active");
 					$trigger.addClass("ui-state-active");
@@ -100,5 +103,26 @@ $.fn.extend({
 	}
 
 });
+
+/*
+ * logger wrapper
+ */
+
+var logger = function() {
+	var oldConsoleLog = null;
+	var pub = {};
+
+	pub.enableLogger = function enableLogger() {
+		if(oldConsoleLog == null) return;
+		window['console']['log'] = oldConsoleLog;
+	};
+
+	pub.disableLogger = function disableLogger() {
+		oldConsoleLog = console.log;
+		window['console']['log'] = function() {};
+	};
+
+	return pub;
+}();
 
 })(jQuery);
