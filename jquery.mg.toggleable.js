@@ -27,9 +27,9 @@ $.fn.extend({
 			group: "data-toggle-group",
 			target: ".ui-toggleable",
 			toggle: "data-toggle",
+			activate: ".ui-trigger-default",
 			debug: false,
 			filter: null,
-			activate: false,
 			togglein: function(ev, ui) { // ui => trigger
 				var $t = $(ev.target);
 				//console.log('toggleIn', ev.target, ui);
@@ -96,9 +96,12 @@ $.fn.extend({
 
 				});
 
-				if(options.activate) $trigger.trigger(options.event);
-
 			});
+
+			if(options.activate) {
+				$triggers.filter(options.activate).trigger(options.event);
+			}
+
 		});
 	}
 
