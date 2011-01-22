@@ -13,7 +13,7 @@
  * http://mg-crea.com
  */
 
-(function( $, undefined ) {
+(function( $, console, undefined ) {
 
 if(!window.console) window.console = {};
 
@@ -46,7 +46,7 @@ $.fn.extend({
 
 		options = $.extend(defaults, options);
 
-		if(!options.debug) logger.disableLogger();
+		if(!options.debug) console = { log: function(){} };
 
 		console.log("$toggleable ~ initied with options", options);
 
@@ -107,25 +107,4 @@ $.fn.extend({
 
 });
 
-/*
- * logger wrapper
- */
-
-var logger = function() {
-	var oldConsoleLog = null;
-	var pub = {};
-
-	pub.enableLogger = function enableLogger() {
-		if(oldConsoleLog == null) return;
-		window['console']['log'] = oldConsoleLog;
-	};
-
-	pub.disableLogger = function disableLogger() {
-		oldConsoleLog = console.log;
-		window['console']['log'] = function() {};
-	};
-
-	return pub;
-}();
-
-})(jQuery);
+})(jQuery, console);
